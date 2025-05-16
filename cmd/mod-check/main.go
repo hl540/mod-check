@@ -27,16 +27,13 @@ type Module struct {
 
 var goVersion string
 
-func init() {
+func main() {
 	flag.StringVar(&goVersion, "go", "", "go version")
 	flag.Parse()
 	if goVersion == "" {
 		fmt.Println("You must set --go flag")
-		os.Exit(1)
+		return
 	}
-}
-
-func main() {
 	fmt.Println("🔍 检查依赖版本兼容性，指定Go版本:", goVersion)
 
 	// 获取所有依赖
@@ -79,11 +76,14 @@ func main() {
 		})
 		incompatible = append(incompatible, fmt.Sprintf("go get %s@%s", mod.Path, version))
 	}
-	table.Render()
-
-	fmt.Println("🛠️ 替换建议：")
-	for _, mod := range incompatible {
-		fmt.Println(mod)
+	if len(incompatible) > 0 {
+		table.Render()
+		fmt.Println("🛠️ 替换建议：")
+		for _, mod := range incompatible {
+			fmt.Println(mod)
+		}
+	} else {
+		fmt.Println("👉 所有依赖满足")
 	}
 }
 
